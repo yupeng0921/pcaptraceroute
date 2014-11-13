@@ -59,3 +59,23 @@ You can specific another pcap file by using the -g option:
      ./pcaptraceroute -g /tmp/another.pcap 54.223.129.6
 
 You can you 'tcpdump -w' capture a pcap file, and use the editcap command exact the specific package from the pcap file. The pcap file followed by -g should be a single tcp pcap file. The editcap command is belong to the wireshark package.
+
+To get its command line options, run:
+
+    ./pcaptraceroute -h
+    pcaptraceroute [-s src_ip] [-S src_mac] [-D next_mac]
+    [-i device] [-n] [-w waittime] [-q nqueries]
+    [-z sendwait] [-m max_ttl] [-f first_ttl] dst_ip
+    -s src_ip
+    -S src_mac
+    -D next_mac
+    -i device, set network device, default is eth0
+    -n, do not try to map IP addresses to host names when displaying them
+    -w waittime, set the time (in seconds) to wait for a response to a probe, default is 5
+    -q nqueries, set the number of probe packets per hop, default is 3
+    -z sendwait, minimal time interval between probes, default is 0
+    -m max_ttl, specifies the maximum number of hops, default is 30
+    -f first_ttl, specifies with what TTL to start, default is 1
+    -g pcap_package, specifies the pcap file to use, you can generate it by yourself, default is ack.pcap
+    -u, exit after generate tmp files
+    dst_ip, the dest ip address, should NOT be url
