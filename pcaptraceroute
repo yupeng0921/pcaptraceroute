@@ -124,6 +124,13 @@ tmp_dir="/tmp/pt_`echo $RANDOM`_`date +%Y%m%d%H%M%S`"
 echo "tmp_dir: $tmp_dir"
 echo ""
 
+function do_exit() {
+	rm -rf $tmp_dir
+	exit 1
+}
+
+trap 'do_exit' INT
+
 mkdir -p $tmp_dir
 init_package=$tmp_dir/sample.pcap
 
