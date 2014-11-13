@@ -1,0 +1,90 @@
+#!/bin/bash
+
+default_src_ip=""
+default_src_mac=""
+default_dst_mac=""
+default_device="eth0"
+default_port=80
+default_sport=30000
+default_waittime=5
+default_nqueries=3
+default_sendwait=0
+default_max_ttl=30
+default_first_ttl=1
+
+script_name=$(basename $(readlink -nf $0))
+function usage() {
+	echo "$script_name [-s src_ip] [-S src_mac] [-D next_mac]"
+	echo "[-i device] [-p port] [-P sport] [-w waittime] [-q nqueries]"
+	echo "[-z sendwait] [-m max_ttl] [-f first_ttl] dst_ip"
+	echo "-s src_ip"
+	echo "-S src_mac"
+	echo "-D next_mac"
+	echo "-i device, set network device, default is $default_device"
+	echo "-p port, set dst port number, default is $default_port"
+	echo "-P sport, set src port number, default is $default_sport"
+	echo "-w waittime, set the time (in seconds) to wait for a response to a probe, default is $default_waittime"
+	echo "-q nqueries, set the number of probe packets per hop, default is $default_nqueries"
+	echo "-z sendwait, minimal time interval between probes, default is $default_sendwait"
+	echo "-m max_ttl, specifies the maximum number of hops, default is $default_max_ttl"
+	echo "-f first_ttl, specifies with what TTL to start, default is $default_first_ttl"
+	echo "dst_ip, the dest ip address, should NOT be url"
+}
+
+src_ip=$default_src_ip
+src_mac=$default_src_mac
+dst_mac=$default_dst_mac
+device=$default_device
+port=$default_port
+sport=$default_sport
+waittime=$default_waittime
+nqueries=$default_nqueries
+sendwait=$default_sendwait
+max_ttl=$default_max_ttl
+first_ttl=$defalt_first_ttl
+
+while getopts "s:S:D:i:p:P:w:q:z:m:f:h" arg
+do
+	case $arg in
+		s)
+			src_ip=$OPTARG
+			;;
+		S)
+			src_mac=$OPTARG
+			;;
+		D)
+			dst_mac=$OPTARG
+			;;
+		i)
+			device=$OPTARG
+			;;
+		p)
+			port=$OPTARG
+			;;
+		P)
+			sport=$OPTARG
+			;;
+		w)
+			waittime=$OPTARG
+			;;
+		q)
+			nqueries=$OPTARG
+			;;
+		z)
+			sendwait=$OPTARG
+			;;
+		m)
+			max_ttl=$OPTARG
+			;;
+		f)
+			first_ttl=$OPTARG
+			;;
+		h)
+			usage
+			exit 0
+			;;
+	esac
+done
+
+shift $(($OPTIND - 1))
+dst_ip=$1
