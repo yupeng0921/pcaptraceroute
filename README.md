@@ -58,4 +58,4 @@ You can specific another pcap file by using the -g option:
 
      ./pcaptraceroute -g /tmp/another.pcap 54.223.129.6
 
-You can you 'tcpdump -w' capture a pcap file, and use the editcap command exact the specific package from the pcap file. The pcap file followed by -g should be a single tcp pcap file.
+You can you 'tcpdump -w' capture a pcap file, and use the editcap command exact the specific package from the pcap file. The pcap file followed by -g should be a single tcp pcap file. The editcap command is belong to the wireshark package.
