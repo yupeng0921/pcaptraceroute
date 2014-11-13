@@ -41,7 +41,7 @@ max_ttl=$default_max_ttl
 first_ttl=$default_first_ttl
 pcap_package=$default_pcap_package
 
-while getopts "s:S:D:i:p:P:w:q:z:m:f:h" arg
+while getopts "s:S:D:i:p:P:w:q:z:m:f:h" arg;
 do
 	case $arg in
 		s)
@@ -126,7 +126,7 @@ tcprewrite --infile=$pcap_package --outfile=$init_package \
 	--dstipmap=0.0.0.0/0:$dst_ip --enet-dmac=$dst_mac \
 	--fixcsum
 
-for i in `seq $max_ttl`; do
+for i in `seq $first_ttl $max_ttl`; do
 	tcprewrite --infile=$init_package --outfile=$init_package$i \
 		--ttl $i --fixcsum
 done
