@@ -140,11 +140,11 @@ for i in `seq $first_ttl $max_ttl`; do
 	sleep 1
 	count=`grep $dst_ip $tcpdump_output | wc -l`
 	if [ $count -ge 1 ]; then
-		ip_addr=`grep $dst_ip $tcpdump_output | tr -s ' ' | cut -f3 -d' '`
-		echo "$i $ip_addr"
+		# ip_addr=`grep $dst_ip $tcpdump_output | tr -s ' ' | cut -f3 -d' '`
+		echo "$i $dst_ip"
 		disown $pid
 		kill -9 $pid > /dev/null 2>&1
-		rm -rf $tmp_dir
+		# rm -rf $tmp_dir
 		exit 0
 	fi
 	count=`grep 'ICMP time exceeded' $tcpdump_output | wc -l`
