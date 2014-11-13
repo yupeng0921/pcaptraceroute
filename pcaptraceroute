@@ -4,8 +4,6 @@ default_src_ip=""
 default_src_mac=""
 default_dst_mac=""
 default_device="eth0"
-default_port=80
-default_sport=30000
 default_waittime=5
 default_nqueries=3
 default_sendwait=0
@@ -23,8 +21,6 @@ function usage() {
 	echo "-S src_mac"
 	echo "-D next_mac"
 	echo "-i device, set network device, default is $default_device"
-	echo "-p port, set dst port number, default is $default_port"
-	echo "-P sport, set src port number, default is $default_sport"
 	echo "-w waittime, set the time (in seconds) to wait for a response to a probe, default is $default_waittime"
 	echo "-q nqueries, set the number of probe packets per hop, default is $default_nqueries"
 	echo "-z sendwait, minimal time interval between probes, default is $default_sendwait"
@@ -38,8 +34,6 @@ src_ip=$default_src_ip
 src_mac=$default_src_mac
 dst_mac=$default_dst_mac
 device=$default_device
-port=$default_port
-sport=$default_sport
 waittime=$default_waittime
 nqueries=$default_nqueries
 sendwait=$default_sendwait
@@ -61,12 +55,6 @@ do
 			;;
 		i)
 			device=$OPTARG
-			;;
-		p)
-			port=$OPTARG
-			;;
-		P)
-			sport=$OPTARG
 			;;
 		w)
 			waittime=$OPTARG
@@ -119,8 +107,6 @@ echo "dst_ip: $dst_ip"
 echo "src_mac: $src_mac"
 echo "dst_mac: $dst_mac"
 echo "device: $device"
-echo "port: $port"
-echo "sport: $sport"
 echo "waittime: $waittime"
 echo "nqueries: $nqueries"
 echo "sendwait: $sendwait"
