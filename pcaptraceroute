@@ -135,33 +135,39 @@ done
 minimum_interval=1
 tcpdump_output=$tmp_dit/tcpdump_output
 for i in `seq $first_ttl $max_ttl`; do
-	tcpdump -l -i $device -n icmp or src host $dst_ip > $tcpdump_output 2>&1 &
-	pid=$!
-	tcpreplay --intf1=$device $init_package$i > /dev/null 2>&1
 	captured=0
-	for j in `seq $waittime`; do
-		sleep 1
-		count=`grep $dst_ip $tcpdump_output | wc -l`
-		if [ $count -ge 1 ]; then
-			printf "%02d %s\n" $i $dst_ip
-			disown $pid
-			kill -9 $pid > /dev/null 2>&1
-			rm -rf $tmp_dir
-			exit 0
-		fi
-		count=`grep 'ICMP time exceeded' $tcpdump_output | wc -l`
-		if [ $count -ge 1 ]; then
-			ip_addr=`grep 'ICMP time exceeded' $tcpdump_output | tr -s ' ' | cut -f3 -d' '`
-			printf "%02d %s\n" $i $ip_addr
-			captured=1
+	printf "%02d " $i
+	for j in `seq $nqueries`; do
+		tcpdump -l -i $device -n icmp or src host $dst_ip > $tcpdump_output 2>&1 &
+		pid=$!
+		tcpreplay --intf1=$device $init_package$i > /dev/null 2>&1
+		for k in `seq $waittime`; do
+			sleep $minimum_interval
+			count=`grep $dst_ip $tcpdump_output | wc -l`
+			if [ $count -ge 1 ]; then
+				printf "%s\n" $dst_ip
+				disown $pid
+				kill -9 $pid > /dev/null 2>&1
+				rm -rf $tmp_dir
+				exit 0
+			fi
+			count=`grep 'ICMP time exceeded' $tcpdump_output | wc -l`
+			if [ $count -ge 1 ]; then
+				ip_addr=`grep 'ICMP time exceeded' $tcpdump_output | tr -s ' ' | cut -f3 -d' '`
+				printf "%s" $ip_addr
+				captured=1
+				break
+			fi
+		done
+		disown $pid
+		kill -9 $pid > /dev/null 2>&1
+		if [ $captured -eq 0 ]; then
+			printf "* "
+		else
 			break
 		fi
 	done
-	if [ $captured -eq 0 ]; then
-		printf "%02d *\n" $i
-	fi
-	disown $pid
-	kill -9 $pid > /dev/null 2>&1
+	printf "\n"
 done
 
 disown $pid
