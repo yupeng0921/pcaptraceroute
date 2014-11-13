@@ -119,11 +119,15 @@ tmp_dir="/tmp/pt_`echo $RANDOM`_`date +%Y%m%d%H%M%S`"
 echo "tmp_dir: $tmp_dir"
 
 mkdir -p $tmp_dir
-init_package=$tmp_dir/init.pcap
+init_package=$tmp_dir/sample.pcap
 
 tcprewrite --infile=$pcap_package --outfile=$init_package \
 	--srcipmap=0.0.0.0/0:$src_ip --enet-smac=$src_mac \
 	--dstipmap=0.0.0.0/0:$dst_ip --enet-dmac=$dst_mac \
 	--fixcsum
 
+for i in `seq $max_ttl`; do
+	tcprewrite --infile=$init_package --outfile=$init_package$i \
+		--ttl $i --fixcsum
+done
 exit 0
