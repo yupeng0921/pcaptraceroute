@@ -166,12 +166,11 @@ for i in `seq $first_ttl $max_ttl`; do
 		else
 			break
 		fi
+		sleep $sendwait
 	done
 	printf "\n"
 done
 
-disown $pid
-kill -9 $pid > /dev/null 2>&1
 rm -rf $tmp_dir
 
 exit 0
