@@ -117,6 +117,7 @@ echo "pcap_package: $pcap_package"
 
 tmp_dir="/tmp/pt_`echo $RANDOM`_`date +%Y%m%d%H%M%S`"
 echo "tmp_dir: $tmp_dir"
+echo ""
 
 mkdir -p $tmp_dir
 init_package=$tmp_dir/sample.pcap
@@ -130,4 +131,35 @@ for i in `seq $first_ttl $max_ttl`; do
 	tcprewrite --infile=$init_package --outfile=$init_package$i \
 		--ttl $i --fixcsum
 done
+
+tcpdump_output=$tmp_dit/tcpdump_output
+for i in `seq $first_ttl $max_ttl`; do
+	tcpdump -l -i $device -n icmp or src host $dst_ip > $tcpdump_output 2>&1 &
+	pid=$!
+	tcpreplay --intf1=$device $init_package$i > /dev/null 2>&1
+	sleep 1
+	count=`grep $dst_ip $tcpdump_output | wc -l`
+	if [ $count -ge 1 ]; then
+		ip_addr=`grep $dst_ip $tcpdump_output | tr -s ' ' | cut -f3 -d' '`
+		echo "$i $ip_addr"
+		disown $pid
+		kill -9 $pid > /dev/null 2>&1
+		rm -rf $tmp_dir
+		exit 0
+	fi
+	count=`grep 'ICMP time exceeded' $tcpdump_output | wc -l`
+	if [ $count -ge 1 ]; then
+		ip_addr=`grep 'ICMP time exceeded' $tcpdump_output | tr -s ' ' | cut -f3 -d' '`
+		echo "$i $ip_addr"
+	else
+		echo "$i *"
+	fi
+	disown $pid
+	kill -9 $pid > /dev/null 2>&1
+done
+
+disown $pid
+kill -9 $pid > /dev/null 2>&1
+rm -rf $tmp_dir
+
 exit 0
