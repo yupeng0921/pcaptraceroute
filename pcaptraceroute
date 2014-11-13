@@ -43,7 +43,7 @@ first_ttl=$default_first_ttl
 pcap_package=$default_pcap_package
 not_map_host=""
 
-while getopts "s:S:D:i:np:P:w:q:z:m:f:h" arg;
+while getopts "s:S:D:i:np:P:w:q:z:m:f:g:h" arg;
 do
 	case $arg in
 		s)
