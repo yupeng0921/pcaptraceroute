@@ -15,12 +15,13 @@ default_pcap_package="ack.pcap"
 script_name=$(basename $(readlink -nf $0))
 function usage() {
 	echo "$script_name [-s src_ip] [-S src_mac] [-D next_mac]"
-	echo "[-i device] [-p port] [-P sport] [-w waittime] [-q nqueries]"
+	echo "[-i device] [-n] [-w waittime] [-q nqueries]"
 	echo "[-z sendwait] [-m max_ttl] [-f first_ttl] dst_ip"
 	echo "-s src_ip"
 	echo "-S src_mac"
 	echo "-D next_mac"
 	echo "-i device, set network device, default is $default_device"
+	echo "-n, do not try to map IP addresses to host names when displaying them"
 	echo "-w waittime, set the time (in seconds) to wait for a response to a probe, default is $default_waittime"
 	echo "-q nqueries, set the number of probe packets per hop, default is $default_nqueries"
 	echo "-z sendwait, minimal time interval between probes, default is $default_sendwait"
@@ -40,8 +41,9 @@ sendwait=$default_sendwait
 max_ttl=$default_max_ttl
 first_ttl=$default_first_ttl
 pcap_package=$default_pcap_package
+not_map_host=""
 
-while getopts "s:S:D:i:p:P:w:q:z:m:f:h" arg;
+while getopts "s:S:D:i:np:P:w:q:z:m:f:h" arg;
 do
 	case $arg in
 		s)
@@ -55,6 +57,9 @@ do
 			;;
 		i)
 			device=$OPTARG
+			;;
+		n)
+			not_map_host="-n"
 			;;
 		w)
 			waittime=$OPTARG
@@ -138,7 +143,7 @@ for i in `seq $first_ttl $max_ttl`; do
 	captured=0
 	printf "%02d " $i
 	for j in `seq $nqueries`; do
-		tcpdump -l -i $device -n icmp or src host $dst_ip > $tcpdump_output 2>&1 &
+		tcpdump -l -i $device $not_map_host icmp or src host $dst_ip > $tcpdump_output 2>&1 &
 		pid=$!
 		tcpreplay --intf1=$device $init_package$i > /dev/null 2>&1
 		for k in `seq $waittime`; do
