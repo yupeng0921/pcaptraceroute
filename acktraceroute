@@ -41,7 +41,7 @@ waittime=$default_waittime
 nqueries=$default_nqueries
 sendwait=$default_sendwait
 max_ttl=$default_max_ttl
-first_ttl=$defalt_first_ttl
+first_ttl=$default_first_ttl
 
 while getopts "s:S:D:i:p:P:w:q:z:m:f:h" arg
 do
@@ -88,3 +88,36 @@ done
 
 shift $(($OPTIND - 1))
 dst_ip=$1
+
+if [ "$dst_ip" == "" ]; then
+	usage
+	exit 1
+fi
+
+if [ "$src_ip" == "" ]; then
+	src_ip=`ifconfig $device | grep 'inet addr' | tr -s ' ' | cut -f3 -d' ' | cut -f2 -d ':'`
+fi
+
+if [ "$src_mac" == "" ]; then
+	src_mac=`ifconfig $device | grep HWaddr | tr -s ' ' | cut -f5 -d' '`
+fi
+
+if [ "$dst_mac" == "" ]; then
+	gw=`route | grep $device | grep default | tr -s ' ' | cut -f2 -d' '`
+	dst_mac=`arp -a | grep $gw | tr -s ' ' | cut -f4 -d' '`
+fi
+
+echo "src_ip: $src_ip"
+echo "dst_ip: $dst_ip"
+echo "src_mac: $src_mac"
+echo "dst_mac: $dst_mac"
+echo "device: $device"
+echo "port: $port"
+echo "sport: $sport"
+echo "waittime: $waittime"
+echo "nqueries: $nqueries"
+echo "sendwait: $sendwait"
+echo "max_ttl: $max_ttl"
+echo "first_ttl: $first_ttl"
+
+exit 0
