@@ -28,6 +28,7 @@ function usage() {
 	echo "-m max_ttl, specifies the maximum number of hops, default is $default_max_ttl"
 	echo "-f first_ttl, specifies with what TTL to start, default is $default_first_ttl"
 	echo "-g pcap_package, specifies the pcap file to use, you can generate it by yourself, default is $default_pcap_package"
+	echo "-u, exit after generate tmp files"
 	echo "dst_ip, the dest ip address, should NOT be url"
 }
 
@@ -42,8 +43,9 @@ max_ttl=$default_max_ttl
 first_ttl=$default_first_ttl
 pcap_package=$default_pcap_package
 not_map_host=""
+pseudo=0
 
-while getopts "s:S:D:i:np:P:w:q:z:m:f:g:h" arg;
+while getopts "s:S:D:i:np:P:w:q:z:m:f:g:uh" arg;
 do
 	case $arg in
 		s)
@@ -78,6 +80,9 @@ do
 			;;
 		g)
 			pcap_package=$OPTARG
+			;;
+		u)
+			pseudo=1
 			;;
 		h)
 			usage
@@ -143,6 +148,10 @@ for i in `seq $first_ttl $max_ttl`; do
 	tcprewrite --infile=$init_package --outfile=$init_package$i \
 		--ttl $i --fixcsum
 done
+
+if [ $pseudo -eq 1 ]; then
+	exit 0
+fi
 
 minimum_interval=1
 tcpdump_output=$tmp_dit/tcpdump_output
