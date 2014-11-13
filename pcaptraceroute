@@ -12,6 +12,8 @@ default_sendwait=0
 default_max_ttl=30
 default_first_ttl=1
 
+default_pcap_package="ack.pcap"
+
 script_name=$(basename $(readlink -nf $0))
 function usage() {
 	echo "$script_name [-s src_ip] [-S src_mac] [-D next_mac]"
@@ -28,6 +30,7 @@ function usage() {
 	echo "-z sendwait, minimal time interval between probes, default is $default_sendwait"
 	echo "-m max_ttl, specifies the maximum number of hops, default is $default_max_ttl"
 	echo "-f first_ttl, specifies with what TTL to start, default is $default_first_ttl"
+	echo "-g pcap_package, specifies the pcap file to use, you can generate it by yourself, default is $default_pcap_package"
 	echo "dst_ip, the dest ip address, should NOT be url"
 }
 
@@ -42,6 +45,7 @@ nqueries=$default_nqueries
 sendwait=$default_sendwait
 max_ttl=$default_max_ttl
 first_ttl=$default_first_ttl
+pcap_package=$default_pcap_package
 
 while getopts "s:S:D:i:p:P:w:q:z:m:f:h" arg
 do
@@ -78,6 +82,9 @@ do
 			;;
 		f)
 			first_ttl=$OPTARG
+			;;
+		g)
+			pcap_package=$OPTARG
 			;;
 		h)
 			usage
@@ -119,5 +126,18 @@ echo "nqueries: $nqueries"
 echo "sendwait: $sendwait"
 echo "max_ttl: $max_ttl"
 echo "first_ttl: $first_ttl"
+echo "pcap_package: $pcap_package"
+
+
+tmp_dir="/tmp/pt_`echo $RANDOM`_`date +%Y%m%d%H%M%S`"
+echo "tmp_dir: $tmp_dir"
+
+mkdir -p $tmp_dir
+init_package=$tmp_dir/init.pcap
+
+tcprewrite --infile=$pcap_package --outfile=$init_package \
+	--srcipmap=0.0.0.0/0:$src_ip --enet-smac=$src_mac \
+	--dstipmap=0.0.0.0/0:$dst_ip --enet-dmac=$dst_mac \
+	--fixcsum
 
 exit 0
